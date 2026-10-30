@@ -22,6 +22,7 @@ test("forsiden viser kategorier med antall og billigst øl", async ({ page }) =>
 });
 
 test("barlisten sorterer på billigst øl og filtrerer på åpent nå", async ({ page }) => {
+  await page.clock.setFixedTime(new Date("2026-10-30T21:00:00+01:00"));
   await page.goto("/k/barer");
   const kort = page.getByTestId("sted");
   await expect(kort).toHaveCount(3);
@@ -49,6 +50,12 @@ test("stedsiden viser åpningstider, lagring og prisskjema", async ({ page }) =>
 test("gratis-siden viser bare gratis steder", async ({ page }) => {
   await page.goto("/gratis");
   await expect(page.getByTestId("sted")).toHaveCount(4);
+});
+
+test("bar åpen over midnatt viser riktig stengetid", async ({ page }) => {
+  await page.clock.setFixedTime(new Date("2026-10-30T21:00:00+01:00"));
+  await page.goto("/sted/n3");
+  await expect(page.getByText("Åpen til 03:30").first()).toBeVisible();
 });
 
 test("søk finner steder", async ({ page }) => {

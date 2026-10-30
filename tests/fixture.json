@@ -1,7 +1,7 @@
 {"hentet":"2026-10-30T03:17:00Z","kilde":"testdata","steder":[
 {"id":"n1","k":"barer","t":"Bar","n":"Testbar Nord","la":59.9225,"lo":10.7590,"a":"Testgata 1","oh":"24/7","ute":1},
 {"id":"n2","k":"barer","t":"Pub","n":"Testpub Sør","la":59.9100,"lo":10.7500,"a":"Prøveveien 2","oh":"off"},
-{"id":"n3","k":"barer","t":"Bar","n":"Billigbaren","la":59.9150,"lo":10.7600,"oh":"24/7"},
+{"id":"n3","k":"barer","t":"Bar","n":"Billigbaren","la":59.9150,"lo":10.7600,"oh":"Mo-Su 18:00-03:30"},
 {"id":"n4","k":"mat","t":"Restaurant","n":"Testrestauranten","la":59.9130,"lo":10.7400,"c":"italian","oh":"24/7"},
 {"id":"n5","k":"kafeer","t":"Kafé","n":"Testkafeen","la":59.9200,"lo":10.7550},
 {"id":"w6","k":"parker","t":"Park","n":"Testparken","la":59.9270,"lo":10.7000,"g":1},

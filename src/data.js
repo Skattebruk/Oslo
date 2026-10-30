@@ -56,7 +56,10 @@ export function status(s, nå = new Date()) {
   if (!o) return { kjent: false, aapen: false, tekst: s.oh ? "Åpningstider kan ikke leses" : "Ukjente åpningstider" };
   try {
     const aapen = o.getState(nå);
-    const neste = o.getNextChange(nå);
+    // Biblioteket kan melde «endring» ved midnatt selv om stedet holder åpent.
+    // Hopp videre til første tidspunkt der åpen/stengt faktisk skifter.
+    let neste = o.getNextChange(nå);
+    for (let i = 0; neste && i < 14 && o.getState(neste) === aapen; i++) neste = o.getNextChange(neste);
     if (aapen) {
       if (!neste) return { kjent: true, aapen: true, tekst: "Åpent hele døgnet", stengerMin: 99999 };
       const min = Math.round((neste - nå) / 60000);
