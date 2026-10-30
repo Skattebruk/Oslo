@@ -1,0 +1,13 @@
+{"hentet":"2026-10-30T03:17:00Z","kilde":"testdata","steder":[
+{"id":"n1","k":"barer","t":"Bar","n":"Testbar Nord","la":59.9225,"lo":10.7590,"a":"Testgata 1","oh":"24/7","ute":1},
+{"id":"n2","k":"barer","t":"Pub","n":"Testpub Sør","la":59.9100,"lo":10.7500,"a":"Prøveveien 2","oh":"off"},
+{"id":"n3","k":"barer","t":"Bar","n":"Billigbaren","la":59.9150,"lo":10.7600,"oh":"24/7"},
+{"id":"n4","k":"mat","t":"Restaurant","n":"Testrestauranten","la":59.9130,"lo":10.7400,"c":"italian","oh":"24/7"},
+{"id":"n5","k":"kafeer","t":"Kafé","n":"Testkafeen","la":59.9200,"lo":10.7550},
+{"id":"w6","k":"parker","t":"Park","n":"Testparken","la":59.9270,"lo":10.7000,"g":1},
+{"id":"w7","k":"bading","t":"Strand","n":"Teststranda","la":59.9000,"lo":10.6800,"g":1},
+{"id":"n8","k":"utsikt","t":"Utsiktspunkt","n":"Testtoppen","la":59.9300,"lo":10.7800,"g":1},
+{"id":"n9","k":"museer","t":"Museum","n":"Testmuseet","la":59.9110,"lo":10.7300,"oh":"Tu-Su 10:00-17:00"},
+{"id":"n10","k":"aktiviteter","t":"Kino","n":"Testkinoen","la":59.9140,"lo":10.7450},
+{"id":"n11","k":"lekeplasser","t":"Lekeplass","n":"Testlekeplassen","la":59.9250,"lo":10.7650,"g":1}
+]}

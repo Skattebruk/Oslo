@@ -9,18 +9,16 @@ const SERVERE = [
   "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
 ];
 
-// Oslo = fylke NO-03. Alle navngitte steder i disse kategoriene.
-const SPØRRING = `
-[out:json][timeout:180];
-area["ISO3166-2"="NO-03"]->.oslo;
-(
-  nwr["amenity"~"^(bar|pub|biergarten|nightclub|restaurant|fast_food|cafe|food_court|ice_cream|cinema|theatre|arts_centre|public_bath|sauna)$"]["name"](area.oslo);
-  nwr["leisure"~"^(park|garden|beach_resort|swimming_area|playground|bowling_alley|escape_game|ice_rink|water_park|sauna|fitness_station|dog_park|miniature_golf|sports_centre)$"]["name"](area.oslo);
-  nwr["natural"="beach"]["name"](area.oslo);
-  nwr["tourism"~"^(museum|gallery|viewpoint|attraction|zoo|theme_park)$"]["name"](area.oslo);
-);
-out center tags;
-`;
+// Oslo kommune: hele kommunen (admin_level 7, navn Oslo). Reserve: kartutsnitt.
+const OMRÅDE = `area["name"="Oslo"]["boundary"="administrative"]["admin_level"~"^(4|7)$"]->.oslo;`;
+const BBOX = "59.80,10.48,60.14,10.95";
+const filtre = f => `
+  nwr["amenity"~"^(bar|pub|biergarten|nightclub|restaurant|fast_food|cafe|food_court|ice_cream|cinema|theatre|arts_centre|public_bath|sauna)$"]["name"](${f});
+  nwr["leisure"~"^(park|garden|beach_resort|swimming_area|playground|bowling_alley|escape_game|ice_rink|water_park|sauna|fitness_station|dog_park|miniature_golf|sports_centre)$"]["name"](${f});
+  nwr["natural"="beach"]["name"](${f});
+  nwr["tourism"~"^(museum|gallery|viewpoint|attraction|zoo|theme_park)$"]["name"](${f});`;
+const SPØRRING = `[out:json][timeout:240];\n${OMRÅDE}\n(${filtre("area.oslo")}\n);\nout center tags;`;
+const SPØRRING_BBOX = `[out:json][timeout:240];\n(${filtre(BBOX)}\n);\nout center tags;`;
 
 export function kategori(t) {
   const a = t.amenity, l = t.leisure, tu = t.tourism, n = t.natural;
@@ -59,7 +57,7 @@ export function gratis(k, t) {
   return false;
 }
 
-async function hent() {
+async function hent(SPØRRING) {
   let siste;
   for (const url of SERVERE) {
     try {
@@ -70,7 +68,7 @@ async function hent() {
       });
       if (!svar.ok) throw new Error(`${url}: HTTP ${svar.status}`);
       return await svar.json();
-    } catch (e) { siste = e; console.warn("Feilet:", e.message); }
+    } catch (e) { siste = e; console.log("::warning::" + e.message); }
   }
   throw siste;
 }
@@ -106,11 +104,20 @@ export function tilSteder(elements) {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const json = await hent();
-  const steder = tilSteder(json.elements);
+  let steder = [];
+  try {
+    steder = tilSteder((await hent(SPØRRING)).elements);
+    console.log(`Områdespørring: ${steder.length} steder`);
+  } catch (e) { console.log("::warning::Områdespørring feilet: " + e.message); }
+  if (steder.length < 500) {
+    try {
+      steder = tilSteder((await hent(SPØRRING_BBOX)).elements);
+      console.log(`Kartutsnitt: ${steder.length} steder`);
+    } catch (e) { console.log("::error::Kartutsnitt feilet også: " + e.message); process.exit(1); }
+  }
   mkdirSync("public/data", { recursive: true });
   writeFileSync("public/data/steder.json", JSON.stringify({ hentet: new Date().toISOString(), kilde: "© OpenStreetMap-bidragsytere (ODbL)", steder }));
   const per = steder.reduce((m, s) => ((m[s.k] = (m[s.k] || 0) + 1), m), {});
-  console.log(`Lagret ${steder.length} steder:`, per);
-  if (steder.length < 500) { console.error("Mistenkelig få steder – avbryter"); process.exit(1); }
+  console.log(`::notice::Lagret ${steder.length} steder: ${JSON.stringify(per)}`);
+  if (steder.length < 500) { console.log("::error::Mistenkelig få steder – avbryter"); process.exit(1); }
 }

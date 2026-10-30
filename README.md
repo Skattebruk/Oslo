@@ -1,16 +1,28 @@
-# React + Vite
+# Oslo
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Alle barer, restauranter, kafeer, parker, badeplasser, museer og aktiviteter i Oslo – med filtre for **åpent nå**, **gratis**, **nær meg** og **billigst øl**. Fungerer som nettside og kan installeres som app på mobilen (PWA).
 
-Currently, two official plugins are available:
+## Slik henger det sammen
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+| Del | Hvor |
+|---|---|
+| Steder, adresser, åpningstider | OpenStreetMap, hentes hver natt av `.github/workflows/data.yml` → `public/data/steder.json` |
+| Ølpriser | Meldt inn av brukere via `api/priser.js` (Upstash Redis) |
+| Vær | MET Norge via `api/vaer.js` |
+| Kart | Leaflet + OpenStreetMap-fliser |
 
-## React Compiler
+## Kom i gang
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm install
+npm run hent-data   # henter ekte data (krever internett)
+npm run dev
+npm test            # Playwright-tester med testdata
+```
 
-## Expanding the Oxlint configuration
+## Publisering (Vercel)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+1. Importer repoet i Vercel (rammeverk: Vite).
+2. For prisinnmelding: legg til Upstash Redis fra Vercel Marketplace. Den setter miljøvariablene automatisk. Uten den vises priser ikke, og innmelding gir en vennlig melding.
+
+Data © OpenStreetMap-bidragsytere (ODbL).
