@@ -63,7 +63,7 @@ export function status(s, nå = new Date()) {
     if (aapen) {
       if (!neste) return { kjent: true, aapen: true, tekst: "Åpent hele døgnet", stengerMin: 99999 };
       const min = Math.round((neste - nå) / 60000);
-      return { kjent: true, aapen: true, tekst: `Åpen til ${kl(neste)}`, stengerMin: min, snart: min <= 45 };
+      return { kjent: true, aapen: true, tekst: `Åpen til ${neste.getHours() === 0 && neste.getMinutes() === 0 ? "midnatt" : kl(neste)}`, stengerMin: min, snart: min <= 45 };
     }
     if (!neste) return { kjent: true, aapen: false, tekst: "Stengt" };
     const samme = neste.toDateString() === nå.toDateString();
@@ -82,10 +82,20 @@ export function uke(s, nå = new Date()) {
   for (let i = 0; i < 7; i++) {
     const fra = new Date(start); fra.setDate(start.getDate() + i);
     const til = new Date(fra); til.setDate(fra.getDate() + 1);
+    // Ta med intervaller som STARTER denne dagen, og følg dem over midnatt
+    // (f.eks. 15:00–02:30), i stedet for å kutte dem ved 24:00.
     let tider = [];
-    try { tider = o.getOpenIntervals(fra, til); } catch { return null; }
-    const tekst = tider.length === 0 ? "Stengt"
-      : tider.map(([a, b]) => (b - a >= 86400000 - 60000 ? "Hele døgnet" : `${kl(a)}–${kl(b).replace("00:00", "24:00")}`)).join(", ");
+    const forlenget = new Date(til.getTime() + 12 * 3600000);
+    const tidlig = new Date(fra.getTime() - 12 * 3600000);
+    try { tider = o.getOpenIntervals(tidlig, forlenget); } catch { return null; }
+    const slått = [];
+    for (const [a, b] of tider) {
+      const forrige = slått[slått.length - 1];
+      if (forrige && a - forrige[1] <= 60000) forrige[1] = b; else slått.push([a, b]);
+    }
+    const dagens = slått.filter(([a]) => a >= fra && a < til);
+    const tekst = dagens.length === 0 ? "Stengt"
+      : dagens.map(([a, b]) => (b - a >= 86400000 - 60000 ? "Hele døgnet" : `${kl(a)}–${b.getHours() === 0 && b.getMinutes() === 0 ? "24:00" : kl(b)}`)).join(", ");
     const navn = ukedag(fra);
     rader.push({ dag: navn[0].toUpperCase() + navn.slice(1), tekst, idag: i === 0 });
   }
